@@ -62,6 +62,7 @@
     if (config.narrator) $('f-narrator').value = config.narrator;
     if (config.focus && !$('f-focus').value) $('f-focus').value = config.focus;
     if (config.upload) $('f-upload').value = config.upload;
+    if (config.useCharacter) $('f-character').value = config.useCharacter;
     if (config.privacy) $('f-privacy').value = config.privacy;
   }
   function loadConfig() {
@@ -79,6 +80,8 @@
       $('s-aspect').value = config.aspect || '9:16';
       $('s-narrator').value = config.narrator || 'Japanese Female 1';
       $('s-speed').value = config.speakerSpeed || '';
+      $('s-character').value = config.useCharacter || 'true';
+      $('s-chardir').value = config.charactersDir || '';
       $('s-upload').value = config.upload || 'false';
       $('s-privacy').value = config.privacy || 'PUBLIC';
       $('s-titleprefix').value = config.titlePrefix || '';
@@ -98,6 +101,7 @@
       ['VOICEPEAK（ナレーション音声）', env.voicepeak, '/Applications/voicepeak.app が必要です'],
       ['YouTube ログイン済み（投稿する場合のみ必要）', env.youtubeLogin, '下の「YouTube にログイン」を一度実行してください'],
       ['playwright（投稿する場合のみ必要）', env.playwright, 'このフォルダで npm install を実行してください'],
+      ['解説キャスターの画像（public/characters または設定のフォルダ）', env.characters, '「名前_表情.png」の画像を置いてください'],
       ['ffmpeg（背景生成に失敗したときの保険。無くても動く）', env.ffmpeg, 'brew install ffmpeg'],
     ];
     $('env-check').innerHTML = rows.map(function (r) {
@@ -117,6 +121,7 @@
       dataDir: $('s-datadir').value, shortMovieDir: $('s-smdir').value, shortMoviePort: $('s-smport').value, codexModel: $('s-model').value,
       itemCount: $('s-items').value, durationSec: $('s-duration').value, aspect: $('s-aspect').value, narrator: $('s-narrator').value, speakerSpeed: $('s-speed').value,
       upload: $('s-upload').value, privacy: $('s-privacy').value, titlePrefix: $('s-titleprefix').value, focus: $('s-focus').value, channelTag: $('s-channeltag').value,
+      useCharacter: $('s-character').value, charactersDir: $('s-chardir').value,
     }).then(function (d) { $('settings-msg').textContent = d.ok ? '保存しました。' : (d.error || '保存に失敗しました'); if (d.ok) { config = d.config; renderEnv(d.env || {}); applyDefaultsToForm(); } });
   });
   $('btn-env-refresh').addEventListener('click', function () { loadConfig(); });
