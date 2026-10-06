@@ -1,0 +1,5 @@
+# アシュラ起動スクリプトの状態（pid / url / log）
+.ashura/
+node_modules/
+# 案件ごとの依頼ファイル（公開しない）
+examples/private/

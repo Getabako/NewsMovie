@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ニュース動画メーカー 〜世界の今を、日本で暮らす目で〜</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6"/><path d="M4 20h16"/></symbol>
+</svg>
+
+<header class="site-header">
+  <h1>ニュース動画メーカー</h1>
+  <p class="subtitle">世界の今を、日本で暮らす目で。世界各地の報道を多言語で集めてフラットにまとめ、動画にして YouTube へ</p>
+</header>
+
+<nav class="tabs">
+  <button type="button" class="tab active" data-view="make"><svg class="ic"><use href="#i-globe"/></svg>番組を作る</button>
+  <button type="button" class="tab" data-view="list"><svg class="ic"><use href="#i-list"/></svg>番組の記録</button>
+  <button type="button" class="tab" data-view="settings"><svg class="ic"><use href="#i-gear"/></svg>設定</button>
+</nav>
+
+<main>
+  <div id="license-banner" class="license-banner hidden"></div>
+  <div id="activate-panel" class="activate-panel hidden">
+    <p class="activate-lead">アシュラ会員の方は、登録メールアドレスで認証するとフル版（長尺・クレジットなし）になります。</p>
+    <div class="activate-row"><input id="activate-email" type="email" placeholder="登録メールアドレス"><button type="button" id="activate-btn">認証する</button></div>
+    <p id="activate-msg" class="activate-msg hidden"></p>
+  </div>
+  <div id="env-warning" class="warning-box hidden"></div>
+
+  <!-- 番組を作る -->
+  <section id="view-make">
+    <div class="card">
+      <h2>今日の世界ニュース番組を作る</h2>
+      <p class="note">ボタンを押すと、codex が世界各地の報道を多言語で検索して今日いちばん新しいニュースを集め、日本で暮らす視点を添えた台本と背景イラストを作り、Short Movie で音声合成と動画化まで行います。投稿をオンにすると完成後に YouTube へ投稿します。</p>
+      <div class="form-grid">
+        <div class="field wide"><label>番組タイトル（任意。空なら日付から自動）</label><input id="f-title" type="text" placeholder="例）10月6日の世界ニュース"></div>
+        <fieldset class="field wide"><legend>取り上げるジャンル（ニュース番組のように幅広く）</legend><div class="area-grid" id="genre-grid"></div></fieldset>
+        <div class="field"><label>取り上げる本数</label><select id="f-items"><option value="5">5 本</option><option value="7" selected>7 本</option><option value="9">9 本</option><option value="12">12 本</option></select></div>
+        <div class="field"><label>目標の長さ</label><select id="f-duration"><option value="60">約 1 分（ショート）</option><option value="150" selected>約 2 分半</option><option value="240">約 4 分</option><option value="360">約 6 分</option></select></div>
+        <div class="field"><label>画面の向き</label><select id="f-aspect"><option value="9:16" selected>縦長 9:16（ショート・スマホ向け）</option><option value="16:9">横長 16:9（通常動画）</option></select></div>
+        <div class="field"><label>ナレーター（VOICEPEAK）</label><select id="f-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
+        <div class="field wide"><label>追加の着眼点（任意）</label><input id="f-focus" type="text" placeholder="例）地方で小さな事業をしている人の目線を強めに / 子育て世帯への影響を必ず触れる"></div>
+        <div class="field"><label>YouTube へ投稿</label><select id="f-upload"><option value="false" selected>投稿しない（動画を作るだけ）</option><option value="true">完成したら投稿する</option></select></div>
+        <div class="field"><label>公開範囲</label><select id="f-privacy"><option value="PUBLIC" selected>公開</option><option value="UNLISTED">限定公開</option><option value="PRIVATE">非公開</option></select></div>
+      </div>
+      <button type="button" class="primary" id="btn-submit">番組を作る</button>
+      <p class="note center" id="submit-note">調査 5〜15 分、台本と背景 10〜20 分、音声合成と動画化 5〜15 分。あわせて 30〜50 分ほどかかります。画面を閉じても続きます。</p>
+    </div>
+
+    <div class="card" id="jobs-card">
+      <h2>処理状況</h2>
+      <div id="jobs"></div>
+    </div>
+
+    <div class="card">
+      <h2>編集方針</h2>
+      <ul>
+        <li>日本の報道に寄せない。各地域の現地メディア・国際通信社・公的機関を英語以外の言語も含めて検索し、世界中の出来事を同じ重さで並べる</li>
+        <li>実行した時点でいちばん新しいニュース（原則 24 時間以内）だけを扱い、報道日時と出典 URL を必ず付ける</li>
+        <li>対立のある出来事は、関係する側の主張を併記する。特定の立場の見方を事実のように書かない</li>
+        <li>その上で、各ニュースに「日本で暮らす人への影響と動き方」を添え、番組の締めに「日本で過ごす上での構え」をまとめる</li>
+      </ul>
+      <h3>まず当たる情報源</h3>
+      <ul id="source-list"></ul>
+    </div>
+  </section>
+
+  <!-- 番組の記録 -->
+  <section id="view-list" class="hidden">
+    <div class="card">
+      <h2>番組の記録</h2>
+      <div class="toolbar"><input id="list-search" type="text" placeholder="タイトルで絞り込み"><button type="button" class="secondary" id="btn-open-data-list"><svg class="ic"><use href="#i-folder"/></svg>保存フォルダを開く</button></div>
+      <div id="project-list" class="project-list"></div>
+    </div>
+  </section>
+
+  <!-- 詳細 -->
+  <section id="view-detail" class="hidden">
+    <button type="button" class="secondary" id="btn-back"><svg class="ic"><use href="#i-back"/></svg>記録一覧へ戻る</button>
+    <div id="detail"></div>
+  </section>
+
+  <!-- 設定 -->
+  <section id="view-settings" class="hidden">
+    <div class="card">
+      <h2>環境チェック</h2>
+      <div id="env-check"></div>
+      <div class="actions">
+        <button type="button" class="secondary" id="btn-yt-login"><svg class="ic"><use href="#i-upload"/></svg>YouTube にログイン（初回のみ）</button>
+        <button type="button" class="secondary" id="btn-env-refresh"><svg class="ic"><use href="#i-refresh"/></svg>再チェック</button>
+      </div>
+      <p id="yt-login-msg" class="note"></p>
+    </div>
+    <div class="card">
+      <h2>既定の設定</h2>
+      <p class="note">「番組を作る」画面の初期値と、コマンドライン（<code>node bin/cli.js run</code>）・毎日の自動制作で使う値です。</p>
+      <div class="form-grid">
+        <div class="field wide"><label>データ保存先</label><input id="s-datadir" type="text"></div>
+        <div class="field wide"><label>Short Movie のフォルダ（空なら自動探索）</label><input id="s-smdir" type="text" placeholder="例）/Users/あなた/Desktop/ShortMovie"></div>
+        <div class="field"><label>Short Movie のポート</label><input id="s-smport" type="text" placeholder="4560"></div>
+        <div class="field"><label>codex モデル（空なら既定）</label><input id="s-model" type="text" placeholder="例）gpt-5.6-sol"></div>
+        <div class="field"><label>既定の本数</label><input id="s-items" type="text" placeholder="7"></div>
+        <div class="field"><label>既定の長さ（秒）</label><input id="s-duration" type="text" placeholder="150"></div>
+        <div class="field"><label>既定の向き</label><select id="s-aspect"><option value="9:16">縦長 9:16</option><option value="16:9">横長 16:9</option></select></div>
+        <div class="field"><label>既定のナレーター</label><select id="s-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
+        <div class="field"><label>読み上げ速度（0.5〜2.0）</label><input id="s-speed" type="text" placeholder="1.15"></div>
+        <div class="field"><label>自動制作で投稿する</label><select id="s-upload"><option value="false">投稿しない</option><option value="true">投稿する</option></select></div>
+        <div class="field"><label>既定の公開範囲</label><select id="s-privacy"><option value="PUBLIC">公開</option><option value="UNLISTED">限定公開</option><option value="PRIVATE">非公開</option></select></div>
+        <div class="field"><label>タイトルの先頭に付ける語</label><input id="s-titleprefix" type="text" placeholder="【世界ニュース】"></div>
+        <div class="field wide"><label>追加の着眼点（既定）</label><input id="s-focus" type="text"></div>
+        <div class="field wide"><label>説明欄の末尾に足す文（チャンネル紹介・URL など）</label><textarea id="s-channeltag" rows="2"></textarea></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="secondary" id="btn-save-settings">保存する</button>
+        <button type="button" class="secondary" id="btn-open-data"><svg class="ic"><use href="#i-folder"/></svg>保存フォルダを開く</button>
+      </div>
+      <p id="settings-msg" class="note"></p>
+      <p class="note">設定ファイル: <code id="config-path"></code></p>
+    </div>
+    <div class="card">
+      <h2>毎日自動で作る</h2>
+      <p>ターミナルで次を実行すると、毎日その時刻に番組を作ります（macOS）。投稿する／しないは上の設定に従います。</p>
+      <pre class="cmd">node bin/cli.js schedule 07:30
+node bin/cli.js schedule off   # 解除</pre>
+    </div>
+  </section>
+</main>
+
+<script src="js/app.js"></script>
+</body>
+</html>
