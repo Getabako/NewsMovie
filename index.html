@@ -46,7 +46,8 @@
       <h2>今日の世界ニュース番組を作る</h2>
       <p class="note">ボタンを押すと、codex が世界各地の報道を多言語で検索して今日いちばん新しいニュースを集め、日本で暮らす視点を添えた台本と背景イラストを作り、Short Movie で音声合成と動画化まで行います。投稿をオンにすると完成後に YouTube へ投稿します。</p>
       <div class="form-grid">
-        <div class="field wide"><label>番組タイトル（任意。空なら日付から自動）</label><input id="f-title" type="text" placeholder="例）10月6日の世界ニュース"></div>
+        <div class="field"><label>回の種類</label><select id="f-edition"><option value="world" selected>朝: 世界のニュース</option><option value="japan">夜: 日本のニュース</option></select></div>
+        <div class="field"><label>番組タイトル（任意。空なら自動）</label><input id="f-title" type="text" placeholder="空で OK"></div>
         <fieldset class="field wide"><legend>取り上げるジャンル（ニュース番組のように幅広く）</legend><div class="area-grid" id="genre-grid"></div></fieldset>
         <div class="field"><label>取り上げる本数</label><select id="f-items"><option value="5">5 本</option><option value="7" selected>7 本</option><option value="9">9 本</option><option value="12">12 本</option></select></div>
         <div class="field"><label>目標の長さ</label><select id="f-duration"><option value="60">約 1 分（ショート）</option><option value="150" selected>約 2 分半</option><option value="240">約 4 分</option><option value="360">約 6 分</option></select></div>
@@ -110,6 +111,7 @@
       <h2>既定の設定</h2>
       <p class="note">「番組を作る」画面の初期値と、コマンドライン（<code>node bin/cli.js run</code>）・毎日の自動制作で使う値です。</p>
       <div class="form-grid">
+        <div class="field wide"><label>番組名（タイトルコールと YouTube タイトルに使う）</label><input id="s-program" type="text" placeholder="フラットな視点で世界を眺めるニュース"></div>
         <div class="field wide"><label>データ保存先</label><input id="s-datadir" type="text"></div>
         <div class="field wide"><label>Short Movie のフォルダ（空なら自動探索）</label><input id="s-smdir" type="text" placeholder="例）/Users/あなた/Desktop/ShortMovie"></div>
         <div class="field"><label>Short Movie のポート</label><input id="s-smport" type="text" placeholder="4560"></div>
@@ -127,7 +129,16 @@
         <div class="field"><label>既定の公開範囲</label><select id="s-privacy"><option value="PUBLIC">公開</option><option value="UNLISTED">限定公開</option><option value="PRIVATE">非公開</option></select></div>
         <div class="field"><label>タイトルの先頭に付ける語</label><input id="s-titleprefix" type="text" placeholder="【世界ニュース】"></div>
         <div class="field wide"><label>追加の着眼点（既定）</label><input id="s-focus" type="text"></div>
-        <div class="field wide"><label>説明欄の末尾に足す文（チャンネル紹介・URL など）</label><textarea id="s-channeltag" rows="2"></textarea></div>
+        <div class="field wide"><label>番組の最後の案内（ナレーション。空なら案内シーンを出さない）</label><textarea id="s-promo" rows="3"></textarea></div>
+        <div class="field"><label>案内シーンの見出し（\n で改行）</label><input id="s-promohook" type="text"></div>
+        <div class="field"><label>案内シーンの吹き出し</label><input id="s-promospeech" type="text"></div>
+        <div class="field wide"><label>案内シーンの字幕</label><input id="s-promosub" type="text"></div>
+        <div class="field"><label>アシュラの URL</label><input id="s-ashura" type="text"></div>
+        <div class="field"><label>公式サイトの URL</label><input id="s-site" type="text"></div>
+        <div class="field"><label>本の販売ページ URL</label><input id="s-book" type="text"></div>
+        <div class="field"><label>本の紹介ページ URL</label><input id="s-booklp" type="text"></div>
+        <div class="field"><label>本のタイトル</label><input id="s-booktitle" type="text"></div>
+        <div class="field wide"><label>説明欄の末尾に足す文（任意）</label><textarea id="s-channeltag" rows="2"></textarea></div>
       </div>
       <div class="actions">
         <button type="button" class="secondary" id="btn-save-settings">保存する</button>
@@ -139,8 +150,9 @@
     <div class="card">
       <h2>毎日自動で作る</h2>
       <p>ターミナルで次を実行すると、毎日その時刻に番組を作ります（macOS）。投稿する／しないは上の設定に従います。</p>
-      <pre class="cmd">node bin/cli.js schedule 07:30
-node bin/cli.js schedule off   # 解除</pre>
+      <pre class="cmd">node bin/cli.js schedule 05:10 world   # 朝: 世界のニュース（約 50 分後に投稿）
+node bin/cli.js schedule 19:10 japan   # 夜: 日本のニュース
+node bin/cli.js schedule off           # 解除</pre>
     </div>
   </section>
 </main>

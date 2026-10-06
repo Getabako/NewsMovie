@@ -225,18 +225,19 @@ function listen(port, triesLeft) {
 }
 
 // --- コマンドライン: run / login-youtube / schedule ---
-async function cliRun(briefPath) {
+async function cliRun(briefPath, edition) {
   const cfg = configMod.loadConfig();
   fs.mkdirSync(cfg.dataDir, { recursive: true });
   let over = {};
-  if (briefPath) {
+  if (briefPath && !briefPath.startsWith('--')) {
     const spec = JSON.parse(fs.readFileSync(briefPath, 'utf8'));
     over = spec.brief || spec;
   }
+  if (edition) over.edition = edition;
   const brief = configMod.briefFrom(cfg, over);
   const lic = await getLicense();
   const { project, job } = pipeline.submit(cfg, lic, brief);
-  console.log(`[newsmovie] 制作を開始します: ${project.id}（${brief.itemCount} 本 / 約 ${brief.durationSec} 秒 / ${brief.aspect} / 投稿: ${brief.upload ? brief.privacy : 'しない'}）`);
+  console.log(`[newsmovie] 制作を開始します: ${project.id}（${brief.edition} / ${brief.itemCount} 本 / 約 ${brief.durationSec} 秒 / ${brief.aspect} / 投稿: ${brief.upload ? brief.privacy : 'しない'}）`);
   const timer = setInterval(() => { process.stdout.write(`\r[newsmovie] ${job.stageLabel} ${job.progress}% ${job.detail ? '- ' + job.detail.slice(0, 70) : ''}   `); }, 2000);
   await pipeline.waitIdle();
   clearInterval(timer);
@@ -255,18 +256,23 @@ function cliLoginYoutube() {
 }
 
 // macOS の launchd で毎日決まった時刻に `run` を走らせる（投稿 ON/OFF は設定に従う）
-function cliSchedule(timeArg) {
-  if (process.platform !== 'darwin') { console.error('schedule は macOS（launchd）専用です。Windows はタスクスケジューラで `node bin/cli.js run` を登録してください。'); process.exit(1); }
-  const label = 'net.if-juku.newsmovie.daily';
+function cliSchedule(timeArg, edition) {
+  if (process.platform !== 'darwin') { console.error('schedule は macOS（launchd）専用です。Windows はタスクスケジューラで `node bin/cli.js run --edition=world` を登録してください。'); process.exit(1); }
+  edition = configMod.EDITIONS[edition] ? edition : 'world';
+  const label = `net.if-juku.newsmovie.${edition}`;
   const plist = path.join(os.homedir(), 'Library', 'LaunchAgents', `${label}.plist`);
   if (timeArg === 'off') {
-    try { execFileSync('launchctl', ['unload', plist], { stdio: 'ignore' }); } catch {}
-    try { fs.rmSync(plist, { force: true }); } catch {}
-    console.log('[newsmovie] 毎日の自動制作を解除しました');
+    for (const ed of Object.keys(configMod.EDITIONS)) {
+      const pl = path.join(os.homedir(), 'Library', 'LaunchAgents', `net.if-juku.newsmovie.${ed}.plist`);
+      try { execFileSync('launchctl', ['unload', pl], { stdio: 'ignore' }); } catch {}
+      try { fs.rmSync(pl, { force: true }); } catch {}
+    }
+    try { fs.rmSync(path.join(os.homedir(), 'Library', 'LaunchAgents', 'net.if-juku.newsmovie.daily.plist'), { force: true }); } catch {}
+    console.log('[newsmovie] 毎日の自動制作（朝・夜とも）を解除しました');
     return;
   }
   const m = String(timeArg || '').match(/^(\d{1,2}):(\d{2})$/);
-  if (!m) { console.error('時刻を HH:MM で指定してください（例: node bin/cli.js schedule 07:30）。解除は schedule off'); process.exit(1); }
+  if (!m) { console.error('時刻を HH:MM で指定してください（例: node bin/cli.js schedule 05:10 world / schedule 19:10 japan）。解除は schedule off'); process.exit(1); }
   const logDir = path.join(configMod.loadConfig().dataDir, 'logs');
   fs.mkdirSync(logDir, { recursive: true });
   const nodePath = process.execPath;
@@ -275,24 +281,25 @@ function cliSchedule(timeArg) {
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
   <key>Label</key><string>${label}</string>
-  <key>ProgramArguments</key><array><string>${nodePath}</string><string>${path.join(ROOT, 'bin', 'cli.js')}</string><string>run</string></array>
+  <key>ProgramArguments</key><array><string>${nodePath}</string><string>${path.join(ROOT, 'bin', 'cli.js')}</string><string>run</string><string>--edition=${edition}</string></array>
   <key>WorkingDirectory</key><string>${ROOT}</string>
   <key>EnvironmentVariables</key><dict><key>PATH</key><string>${extraPath}</string><key>HOME</key><string>${os.homedir()}</string></dict>
   <key>StartCalendarInterval</key><dict><key>Hour</key><integer>${parseInt(m[1], 10)}</integer><key>Minute</key><integer>${parseInt(m[2], 10)}</integer></dict>
-  <key>StandardOutPath</key><string>${path.join(logDir, 'daily.log')}</string>
-  <key>StandardErrorPath</key><string>${path.join(logDir, 'daily.log')}</string>
+  <key>StandardOutPath</key><string>${path.join(logDir, `daily-${edition}.log`)}</string>
+  <key>StandardErrorPath</key><string>${path.join(logDir, `daily-${edition}.log`)}</string>
 </dict></plist>
 `;
   fs.mkdirSync(path.dirname(plist), { recursive: true });
   try { execFileSync('launchctl', ['unload', plist], { stdio: 'ignore' }); } catch {}
   fs.writeFileSync(plist, xml);
   execFileSync('launchctl', ['load', plist], { stdio: 'inherit' });
-  console.log(`[newsmovie] 毎日 ${m[1]}:${m[2]} に自動制作します（${plist}）。ログ: ${path.join(logDir, 'daily.log')}`);
+  console.log(`[newsmovie] 毎日 ${m[1]}:${m[2]} に${configMod.EDITIONS[edition].label}を自動制作します（${plist}）。ログ: ${path.join(logDir, `daily-${edition}.log`)}`);
   console.log('  投稿する／しないは設定（~/NewsMovie-data/config.json の upload）に従います。解除: node bin/cli.js schedule off');
 }
 
-const [, , cmd, arg] = process.argv;
-if (cmd === 'run') cliRun(arg).catch((e) => { console.error(e.message); process.exit(1); });
+const [, , cmd, arg, arg2] = process.argv;
+const editionArg = (process.argv.find((a) => a.startsWith('--edition=')) || '').slice(10) || (arg2 && !arg2.startsWith('--') ? arg2 : '');
+if (cmd === 'run') cliRun(arg, editionArg).catch((e) => { console.error(e.message); process.exit(1); });
 else if (cmd === 'login-youtube') cliLoginYoutube();
-else if (cmd === 'schedule') cliSchedule(arg);
+else if (cmd === 'schedule') cliSchedule(arg, editionArg);
 else listen(START_PORT, 20);

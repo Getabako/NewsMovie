@@ -52,10 +52,11 @@
     var box = $('genre-grid');
     if (box.children.length) return;
     var on = String(config.genres || '').split(',');
-    box.innerHTML = meta.genres.map(function (g) { var c = on.indexOf(g.key) >= 0; return '<label class="' + (c ? 'on' : '') + '"><input type="checkbox" value="' + esc(g.key) + '"' + (c ? ' checked' : '') + '>' + esc(g.label) + '</label>'; }).join('');
+    box.innerHTML = meta.genres.map(function (g) { var c = on.indexOf(g.key) >= 0 && !(g.defaultOff && !config.genres); return '<label class="' + (c ? 'on' : '') + '"><input type="checkbox" value="' + esc(g.key) + '"' + (c ? ' checked' : '') + '>' + esc(g.label) + '</label>'; }).join('');
     box.querySelectorAll('input').forEach(function (c) { c.addEventListener('change', function () { c.parentElement.classList.toggle('on', c.checked); }); });
   }
   function applyDefaultsToForm() {
+    if (config.edition) $('f-edition').value = config.edition;
     if (config.itemCount) $('f-items').value = String(config.itemCount);
     if (config.durationSec) { var sel = $('f-duration'); if ([].some.call(sel.options, function (o) { return o.value === String(config.durationSec); })) sel.value = String(config.durationSec); }
     if (config.aspect) $('f-aspect').value = config.aspect;
@@ -72,6 +73,16 @@
       meta = { genres: d.genres || [], sources: d.sources || [], stages: d.stages || [], stageLabels: d.stageLabels || {} };
       renderGenres();
       applyDefaultsToForm();
+      $('s-program').value = config.programName || '';
+      $('s-promo').value = config.promoNarration || '';
+      $('s-promohook').value = (config.promoHook || '').replace(/\n/g, '\\n');
+      $('s-promospeech').value = config.promoSpeech || '';
+      $('s-promosub').value = config.promoSubtitle || '';
+      $('s-ashura').value = config.ashuraUrl || '';
+      $('s-site').value = config.siteUrl || '';
+      $('s-book').value = config.bookUrl || '';
+      $('s-booklp').value = config.bookLpUrl || '';
+      $('s-booktitle').value = config.bookTitle || '';
       $('s-datadir').value = config.dataDir || '';
       $('s-smdir').value = config.shortMovieDir || '';
       $('s-smport').value = config.shortMoviePort || '';
@@ -127,6 +138,9 @@
       upload: $('s-upload').value, privacy: $('s-privacy').value, titlePrefix: $('s-titleprefix').value, focus: $('s-focus').value, channelTag: $('s-channeltag').value,
       useCharacter: $('s-character').value, charactersDir: $('s-chardir').value,
       useCommentator: $('s-commentator').value, commentatorNarrator: $('s-comvoice').value,
+      programName: $('s-program').value, promoNarration: $('s-promo').value, promoHook: $('s-promohook').value.replace(/\\n/g, '\n'),
+      promoSpeech: $('s-promospeech').value, promoSubtitle: $('s-promosub').value,
+      ashuraUrl: $('s-ashura').value, siteUrl: $('s-site').value, bookUrl: $('s-book').value, bookLpUrl: $('s-booklp').value, bookTitle: $('s-booktitle').value,
     }).then(function (d) { $('settings-msg').textContent = d.ok ? '保存しました。' : (d.error || '保存に失敗しました'); if (d.ok) { config = d.config; renderEnv(d.env || {}); applyDefaultsToForm(); } });
   });
   $('btn-env-refresh').addEventListener('click', function () { loadConfig(); });
@@ -142,7 +156,7 @@
     var v = function (id) { return ($(id).value || '').trim(); };
     var genres = Array.prototype.map.call(document.querySelectorAll('#genre-grid input:checked'), function (c) { return c.value; });
     return {
-      title: v('f-title'), genres: genres.join(','), itemCount: v('f-items'), durationSec: v('f-duration'), aspect: v('f-aspect'),
+      title: v('f-title'), edition: v('f-edition'), genres: genres.join(','), itemCount: v('f-items'), durationSec: v('f-duration'), aspect: v('f-aspect'),
       narrator: v('f-narrator'), focus: v('f-focus'), upload: v('f-upload'), privacy: v('f-privacy'),
     };
   }
