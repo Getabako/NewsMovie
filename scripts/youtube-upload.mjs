@@ -7,12 +7,15 @@
 //   初回ログイン:  node scripts/youtube-upload.mjs --login
 //   アップロード:  node scripts/youtube-upload.mjs --file=/path/movie.mp4 --title="..." --description="..." [--privacy=PUBLIC|UNLISTED|PRIVATE]
 //   動作確認:      node scripts/youtube-upload.mjs --dry
+//   ログイン情報の持ち出し: node scripts/youtube-upload.mjs --export-cookies
+//     → ~/.ytupload-data/cookies.json を書く。別の Mac（mini 等）の同じ場所に置くと、
+//       そちらで Chrome にログインしなくても投稿できる（Keychain 暗号化の都合でプロファイル丸ごとのコピーは効かない）
 //
 // 実行はまずヘッドレスで試し、ログイン拒否や起動失敗のときだけウィンドウ表示にフォールバックする。
 // 動画ファイル選択後の失敗は二重アップロード防止のためリトライしない。
 // 結果は stdout に `RESULT {"url":"...","videoId":"..."}` または `RESULT {"error":"..."}` の 1 行で出す。
 
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -23,6 +26,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 const PROFILE_DIR = join(homedir(), '.ytupload-data', 'profile');
 const DEBUG_DIR = join(homedir(), '.ytupload-data');
+const COOKIES_FILE = join(homedir(), '.ytupload-data', 'cookies.json');
 
 function arg(name) {
   const p = process.argv.find((a) => a.startsWith(`--${name}=`));
@@ -57,11 +61,36 @@ async function launch(chromium, headless) {
     ignoreDefaultArgs: ['--enable-automation', '--no-sandbox', '--use-mock-keychain'],
     args: ['--disable-blink-features=AutomationControlled', '--no-default-browser-check'],
   };
+  let ctx;
   try {
-    return await chromium.launchPersistentContext(PROFILE_DIR, { ...opts, channel: 'chrome' });
+    ctx = await chromium.launchPersistentContext(PROFILE_DIR, { ...opts, channel: 'chrome' });
   } catch {
-    return await chromium.launchPersistentContext(PROFILE_DIR, opts);
+    ctx = await chromium.launchPersistentContext(PROFILE_DIR, opts);
   }
+  // 別 Mac から持ち込んだログイン情報（cookies.json）があれば読み込む
+  if (existsSync(COOKIES_FILE)) {
+    try {
+      const cookies = JSON.parse(readFileSync(COOKIES_FILE, 'utf8'));
+      if (Array.isArray(cookies) && cookies.length) await ctx.addCookies(cookies);
+    } catch (e) { console.log(`cookies.json を読めませんでした: ${e}`); }
+  }
+  return ctx;
+}
+
+// 今ログインしているプロファイルの Google / YouTube の Cookie を cookies.json に書き出す
+async function exportCookiesFlow() {
+  const pw = loadPlaywright();
+  if (!pw) { result({ error: 'playwright が見つかりません' }); process.exit(1); }
+  const ctx = await launch(pw.chromium, true);
+  try {
+    const page = ctx.pages()[0] || (await ctx.newPage());
+    await page.goto('https://studio.youtube.com', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(4000);
+    if (page.url().includes('accounts.google.com')) { result({ error: 'このプロファイルはログインしていません（--login で先にログイン）' }); process.exit(1); }
+    const cookies = (await ctx.cookies()).filter((c) => /google|youtube/.test(c.domain));
+    writeFileSync(COOKIES_FILE, JSON.stringify(cookies, null, 2));
+    result({ ok: true, file: COOKIES_FILE, count: cookies.length });
+  } finally { await ctx.close(); }
 }
 
 // ログインは Playwright を使わず「素の Chrome」を専用プロファイルで起動して行う
@@ -244,4 +273,5 @@ async function uploadFlow() {
 }
 
 if (process.argv.includes('--login')) loginFlow();
+else if (process.argv.includes('--export-cookies')) exportCookiesFlow();
 else uploadFlow();
