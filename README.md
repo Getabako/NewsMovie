@@ -18,7 +18,7 @@
 
 ## 解説キャスター
 
-画面には解説キャスター（キャラクター）が立ち、シーンごとに表情（normal / present / think / serious）を変えて吹き出しで一言添える。同梱の `public/characters/caster_*.png` が既定。自分のキャラにしたいときは設定の「キャラクター画像のフォルダ」に `名前_表情.png`（透過 PNG）を置いたフォルダを指定する（Short Movie の `public/characters` もそのまま使える）。出さない設定もできる。
+画面には解説キャスター（キャラクター）が立ち、シーンごとに表情（normal / present / think / serious）を変えて吹き出しで一言添える。さらにニュースごとに **コメンテーター（ちびキャラ、別の声）** が一言で解説を挟む（表情は normal / nod / think / surprised。出さない設定も可）。同梱の `public/characters/caster_*.png`・`commentator_*.png` が既定。自分のキャラにしたいときは設定の「キャラクター画像のフォルダ」に `名前_表情.png`（透過 PNG）を置いたフォルダを指定する（Short Movie の `public/characters` もそのまま使える）。出さない設定もできる。
 
 ## 流れ
 

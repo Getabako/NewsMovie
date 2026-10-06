@@ -53,6 +53,7 @@
         <div class="field"><label>画面の向き</label><select id="f-aspect"><option value="9:16" selected>縦長 9:16（ショート・スマホ向け）</option><option value="16:9">横長 16:9（通常動画）</option></select></div>
         <div class="field"><label>ナレーター（VOICEPEAK）</label><select id="f-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
         <div class="field"><label>解説キャスター（キャラクター）</label><select id="f-character"><option value="true" selected>出す</option><option value="false">出さない</option></select></div>
+        <div class="field"><label>コメンテーター（ニュースごとに一言）</label><select id="f-commentator"><option value="true" selected>出す</option><option value="false">出さない</option></select></div>
         <div class="field wide"><label>追加の着眼点（任意）</label><input id="f-focus" type="text" placeholder="例）地方で小さな事業をしている人の目線を強めに / 子育て世帯への影響を必ず触れる"></div>
         <div class="field"><label>YouTube へ投稿</label><select id="f-upload"><option value="false" selected>投稿しない（動画を作るだけ）</option><option value="true">完成したら投稿する</option></select></div>
         <div class="field"><label>公開範囲</label><select id="f-privacy"><option value="PUBLIC" selected>公開</option><option value="UNLISTED">限定公開</option><option value="PRIVATE">非公開</option></select></div>
@@ -119,7 +120,9 @@
         <div class="field"><label>既定のナレーター</label><select id="s-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
         <div class="field"><label>読み上げ速度（0.5〜2.0）</label><input id="s-speed" type="text" placeholder="1.15"></div>
         <div class="field"><label>解説キャスターを出す</label><select id="s-character"><option value="true">出す</option><option value="false">出さない</option></select></div>
-        <div class="field wide"><label>キャラクター画像のフォルダ（空なら同梱のキャスター。「名前_表情.png」で normal / present / think / serious）</label><input id="s-chardir" type="text" placeholder="例）/Users/あなた/Desktop/ShortMovie/public/characters"></div>
+        <div class="field"><label>コメンテーターを出す</label><select id="s-commentator"><option value="true">出す</option><option value="false">出さない</option></select></div>
+        <div class="field"><label>コメンテーターの声（VOICEPEAK）</label><select id="s-comvoice"><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Female Child</option></select></div>
+        <div class="field wide"><label>キャラクター画像のフォルダ（空なら同梱。「caster_表情.png」「commentator_表情.png」の透過 PNG。別名なら 1 人目がキャスター、2 人目がコメンテーター）</label><input id="s-chardir" type="text" placeholder="例）/Users/あなた/Desktop/ShortMovie/public/characters"></div>
         <div class="field"><label>自動制作で投稿する</label><select id="s-upload"><option value="false">投稿しない</option><option value="true">投稿する</option></select></div>
         <div class="field"><label>既定の公開範囲</label><select id="s-privacy"><option value="PUBLIC">公開</option><option value="UNLISTED">限定公開</option><option value="PRIVATE">非公開</option></select></div>
         <div class="field"><label>タイトルの先頭に付ける語</label><input id="s-titleprefix" type="text" placeholder="【世界ニュース】"></div>

@@ -36,7 +36,7 @@
 - `lib/news/pipeline.js` — research → script → images → render → upload → report の直列パイプライン。失敗した案件はステージ指定で `resume` できる
 - `lib/news/prompts.js` — codex に渡すプロンプト。**編集方針はここ**（情報源 `SOURCES`、調査 `researchPrompt`、台本 `scriptPrompt`、背景 `imagesPrompt`）
 - `lib/news/shortmovie.js` — Short Movie の探索・起動・`POST /api/render`（SSE）呼び出し
-- `public/characters/caster_*.png` — 解説キャスター（透過 PNG、4 表情）。`pipeline.js` の `resolveCharacters` が `名前_表情.png` を拾い、台本の `expression` / `speech` で表情と吹き出しを決める
+- `public/characters/caster_*.png` / `commentator_*.png` — 解説キャスターとコメンテーター（透過 PNG、各 4 表情）。comment シーンは news の直後に入り、speaker=commentator で別の声（`commentatorNarrator`）。`pipeline.js` の `resolveCharacters` が `名前_表情.png` を拾い、台本の `expression` / `speech` で表情と吹き出しを決める
 - `lib/news/render.js` — 記録ページ `report.html` と YouTube のタイトル・説明文
 - `lib/news/codex.js` — codex 呼び出し。`--search` は **exec の前**に置く（後ろだと落ちる）
 - `lib/news/config.js` / `store.js` — 設定と案件の保存（`~/NewsMovie-data/`）
