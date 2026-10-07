@@ -7,6 +7,7 @@
  *
  *   node bin/cli.js                        … サーバー起動（UI モード）
  *   node bin/cli.js run [brief.json]       … 画面なしで 1 本制作して完了まで待つ（自動化用。省略時は設定どおり）
+ *   node bin/cli.js resume <案件ID> <stage> … 失敗した案件を指定ステージから続ける（research/script/images/render/upload/report）
  *   node bin/cli.js login-youtube          … YouTube にログイン（初回のみ）
  *   node bin/cli.js schedule HH:MM         … 毎日 HH:MM に自動制作（macOS launchd）。schedule off で解除
  */
@@ -250,6 +251,24 @@ async function cliRun(briefPath, edition) {
   process.exit(0);
 }
 
+async function cliResume(id, stage) {
+  const cfg = configMod.loadConfig();
+  const p = store.getProject(cfg.dataDir, id);
+  if (!p) { console.error('[newsmovie] 案件が見つかりません: ' + id); process.exit(1); }
+  const lic = await getLicense();
+  const job = pipeline.resume(cfg, lic, p, stage || 'render');
+  console.log(`[newsmovie] ${job.label}`);
+  const timer = setInterval(() => { process.stdout.write(`\r[newsmovie] ${job.stageLabel} ${job.progress}% ${job.detail ? '- ' + job.detail.slice(0, 70) : ''}   `); }, 2000);
+  await pipeline.waitIdle();
+  clearInterval(timer);
+  console.log('');
+  const q = store.getProject(cfg.dataDir, id);
+  if (q.status !== 'done') { console.error('[newsmovie] 失敗: ' + q.error); process.exit(1); }
+  console.log('[newsmovie] 完成: ' + q.dir);
+  if (q.youtube && q.youtube.url) console.log('  youtube: ' + q.youtube.url);
+  process.exit(0);
+}
+
 function cliLoginYoutube() {
   const r = require('child_process').spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'youtube-upload.mjs'), '--login'], { cwd: ROOT, stdio: 'inherit' });
   process.exit(r.status || 0);
@@ -300,6 +319,7 @@ function cliSchedule(timeArg, edition) {
 const [, , cmd, arg, arg2] = process.argv;
 const editionArg = (process.argv.find((a) => a.startsWith('--edition=')) || '').slice(10) || (arg2 && !arg2.startsWith('--') ? arg2 : '');
 if (cmd === 'run') cliRun(arg, editionArg).catch((e) => { console.error(e.message); process.exit(1); });
+else if (cmd === 'resume') cliResume(arg, arg2).catch((e) => { console.error(e.message); process.exit(1); });
 else if (cmd === 'login-youtube') cliLoginYoutube();
 else if (cmd === 'schedule') cliSchedule(arg, editionArg);
 else listen(START_PORT, 20);
