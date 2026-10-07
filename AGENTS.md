@@ -11,6 +11,8 @@
   3. 出力先 `~/NewsMovie-data/<案件ID>/` の `news.json` を読んで要点（見出し・日本で暮らす視点）を伝え、`movie.mp4` と `report.html`、投稿していれば YouTube URL を報告する
   - **編集方針は `lib/news/prompts.js` に書いてある**（世界をフラットに・最新優先・幅広いジャンル・日本で暮らす視点）。ニュースの中身を自分で書かない。必ず codex の `--search` で今日の報道を確かめた結果を使う
   - 投稿（`upload: true`）はユーザーが明示したときだけ。投稿前に公開範囲を確認する
+  - **毎日の番組の設定をチャットで変える**: 「毎日のニュースはこのジャンルで」「本数を〇本に」「〇〇の視点を足して」等と言われたら、`node bin/cli.js config key=value ...` で設定（`~/NewsMovie-data/config.json`）を書き換える。引数なしで現在値を表示。ジャンルは `genres=all` か key のカンマ区切り（`world,economy,society,tech,environment,health,culture,sports`）、着眼点は `focus=...`、本数 `itemCount`、尺 `durationSec`、コメンテーターの声の高さ `commentatorPitch`。自動制作（`schedule`）は次の回からこの設定で動く
+  - **ニュースの選び方・語り口そのものを変える**（「〇〇系のニュースは扱わない」「もっと〇〇寄りに」等）ときは `lib/news/prompts.js` の該当プロンプトを直す（ビルド不要）
   - ツール自体の改造・カスタマイズもこのモードで行う。**有料 API（OpenAI / Gemini / Claude API 等）は使わない。生成はすべて codex CLI（サブスク）。Web 検索も codex の `--search` のみ。**
 - **UIモード**: 「起動して」「UIモード」「画面を開いて」「立ち上げて」等と言われたら、**手順を自分で組み立てず**、次のコマンドをそのまま実行する:
   - macOS / Linux: `bash ashura-start.sh`

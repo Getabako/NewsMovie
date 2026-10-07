@@ -10,6 +10,7 @@
  *   node bin/cli.js resume <案件ID> <stage> … 失敗した案件を指定ステージから続ける（research/script/images/render/upload/report）
  *   node bin/cli.js login-youtube          … YouTube にログイン（初回のみ）
  *   node bin/cli.js schedule HH:MM         … 毎日 HH:MM に自動制作（macOS launchd）。schedule off で解除
+ *   node bin/cli.js config [key=value ...] … 設定（毎日の自動制作の既定値）を表示・変更。例: config genres=all focus=秋田で暮らす人向け
  */
 'use strict';
 const http = require('http');
@@ -316,10 +317,35 @@ function cliSchedule(timeArg, edition) {
   console.log('  投稿する／しないは設定（~/NewsMovie-data/config.json の upload）に従います。解除: node bin/cli.js schedule off');
 }
 
+// 設定の表示・変更（チャットから「毎日のニュースのジャンルを〇〇に」と言われたときもこれで直す）
+function cliConfig(pairs) {
+  const patch = {};
+  for (const p of pairs) {
+    const i = p.indexOf('=');
+    if (i < 1) { console.error(`key=value の形で指定してください: ${p}`); process.exit(1); }
+    const k = p.slice(0, i).trim();
+    let v = p.slice(i + 1).trim();
+    if (!(k in configMod.DEFAULTS)) { console.error(`設定にないキーです: ${k}（使えるキー: ${Object.keys(configMod.DEFAULTS).join(', ')}）`); process.exit(1); }
+    if (k === 'genres') {
+      const keys = configMod.GENRES.map((g) => g.key);
+      v = v === 'all' ? keys.join(',') : v.split(',').map((x) => x.trim()).filter(Boolean).join(',');
+      const bad = v.split(',').filter((g) => !keys.includes(g));
+      if (bad.length || !v) { console.error(`ジャンル key が不正です: ${bad.join(',') || '(空)'}（使える key: ${keys.join(', ')} / all）`); process.exit(1); }
+    }
+    patch[k] = v;
+  }
+  const cfg = Object.keys(patch).length ? configMod.saveConfig(patch) : configMod.loadConfig();
+  if (Object.keys(patch).length) console.log('[newsmovie] 設定を保存しました: ' + configMod.CONFIG_PATH);
+  const genres = String(cfg.genres || '').split(',');
+  console.log('ジャンル: ' + configMod.GENRES.map((g) => `${genres.includes(g.key) ? '[x]' : '[ ]'} ${g.key}（${g.label}）`).join(' / '));
+  for (const k of Object.keys(configMod.DEFAULTS)) if (k !== 'genres') console.log(`${k}: ${cfg[k]}`);
+}
+
 const [, , cmd, arg, arg2] = process.argv;
 const editionArg = (process.argv.find((a) => a.startsWith('--edition=')) || '').slice(10) || (arg2 && !arg2.startsWith('--') ? arg2 : '');
 if (cmd === 'run') cliRun(arg, editionArg).catch((e) => { console.error(e.message); process.exit(1); });
 else if (cmd === 'resume') cliResume(arg, arg2).catch((e) => { console.error(e.message); process.exit(1); });
 else if (cmd === 'login-youtube') cliLoginYoutube();
 else if (cmd === 'schedule') cliSchedule(arg, editionArg);
+else if (cmd === 'config') cliConfig(process.argv.slice(3));
 else listen(START_PORT, 20);
