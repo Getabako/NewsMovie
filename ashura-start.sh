@@ -42,6 +42,21 @@ echo "=================================================="
 echo "  $TOOL_NAME を起動します"
 echo "=================================================="
 
+# --- ASHURA_VERSION_BLOCK（起動中の更新）: 古い版で動いているサーバーを止める -----------------------
+if alive && [ -z "${ASHURA_NO_UPDATE:-}" ]; then
+  ASHURA_STALE=""
+  [ -f .next/BUILD_ID ] && [ .next/BUILD_ID -nt "$PIDF" ] && ASHURA_STALE="作り直した新しい画面に切り替えます"
+  if [ -z "$ASHURA_STALE" ] && command -v curl >/dev/null 2>&1; then
+    ashura_mine=""; [ -f "$STATE_DIR/version.txt" ] && ashura_mine="$(tr -d '\r\n' < "$STATE_DIR/version.txt" | cut -c1-40)"
+    [ "$(curl -fsS --max-time 8 "https://service.if-juku.net/api/ashura/versions?id=news-movie&have=$ashura_mine&format=status" 2>/dev/null)" = "update" ] && ASHURA_STALE="新しい版が出ているので更新します"
+  fi
+  if [ -n "$ASHURA_STALE" ]; then
+    say "動いている $TOOL_NAME は古い版です。いったん止めて、$ASHURA_STALE"
+    kill_tree "$(cat "$PIDF")"; rm -f "$PIDF" "$URLF"; sleep 1
+  fi
+fi
+# --- ASHURA_VERSION_BLOCK ここまで ------------------------------------------------------
+
 # 0. 既に起動中ならブラウザを開くだけ
 if alive && [ -s "$URLF" ] && responds "$(cat "$URLF")"; then
   URL="$(cat "$URLF")"
@@ -94,6 +109,9 @@ ashura_self_update() {
   fi
   ashura_api "format=sha" > "$STATE_DIR/version.txt" 2>/dev/null || true
   rm -rf "$t"
+  # zip から取り込んだファイルは時刻が古いままなので「ソースの変更を検知」では作り直しが走らない。
+  # 印を消して、このあとの手順で必ず作り直させる（消さないと古い画面のまま起動する）
+  rm -f .next/BUILD_ID 2>/dev/null || true
   ok "最新版に更新しました"
   # 更新で必要な部品が変わっていることがあるので、package.json が新しければ入れ直す
   if [ -f package.json ] && [ -d node_modules ] && [ package.json -nt node_modules ]; then
