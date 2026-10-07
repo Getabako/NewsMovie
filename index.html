@@ -49,9 +49,9 @@
         <div class="field"><label>回の種類</label><select id="f-edition"><option value="world" selected>朝: 世界のニュース</option><option value="japan">夜: 日本のニュース</option></select></div>
         <div class="field"><label>番組タイトル（任意。空なら自動）</label><input id="f-title" type="text" placeholder="空で OK"></div>
         <fieldset class="field wide"><legend>取り上げるジャンル（ニュース番組のように幅広く）</legend><div class="area-grid" id="genre-grid"></div></fieldset>
-        <div class="field"><label>取り上げる本数</label><select id="f-items"><option value="5">5 本</option><option value="7" selected>7 本</option><option value="9">9 本</option><option value="12">12 本</option></select></div>
-        <div class="field"><label>目標の長さ</label><select id="f-duration"><option value="60">約 1 分（ショート）</option><option value="150" selected>約 2 分半</option><option value="240">約 4 分</option><option value="360">約 6 分</option></select></div>
-        <div class="field"><label>画面の向き</label><select id="f-aspect"><option value="9:16" selected>縦長 9:16（ショート・スマホ向け）</option><option value="16:9">横長 16:9（通常動画）</option></select></div>
+        <div class="field"><label>取り上げる本数</label><select id="f-items"><option value="4">4 本</option><option value="5" selected>5 本（縦ショート向け）</option><option value="7">7 本（横ロング向け）</option><option value="9">9 本</option><option value="12">12 本</option></select></div>
+        <div class="field"><label>目標の長さ</label><select id="f-duration"><option value="60">約 1 分</option><option value="120">約 2 分</option><option value="165" selected>約 2 分 45 秒（ショートの上限いっぱい）</option><option value="240">約 4 分（横ロング向け）</option><option value="360">約 6 分（横ロング向け）</option></select></div>
+        <div class="field"><label>画面の向き</label><select id="f-aspect"><option value="9:16" selected>縦ショート（3 分以内に自動で収める）</option><option value="16:9">横ロング 16:9（通常動画）</option></select></div>
         <div class="field"><label>ナレーター（VOICEPEAK）</label><select id="f-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
         <div class="field"><label>解説キャスター（キャラクター）</label><select id="f-character"><option value="true" selected>出す</option><option value="false">出さない</option></select></div>
         <div class="field"><label>コメンテーター（ニュースごとに一言）</label><select id="f-commentator"><option value="true" selected>出す</option><option value="false">出さない</option></select></div>
@@ -118,7 +118,7 @@
         <div class="field"><label>codex モデル（空なら既定）</label><input id="s-model" type="text" placeholder="例）gpt-5.6-sol"></div>
         <div class="field"><label>既定の本数</label><input id="s-items" type="text" placeholder="7"></div>
         <div class="field"><label>既定の長さ（秒）</label><input id="s-duration" type="text" placeholder="150"></div>
-        <div class="field"><label>既定の向き</label><select id="s-aspect"><option value="9:16">縦長 9:16</option><option value="16:9">横長 16:9</option></select></div>
+        <div class="field"><label>既定の向き</label><select id="s-aspect"><option value="9:16">縦ショート（3 分以内）</option><option value="16:9">横ロング 16:9</option></select></div>
         <div class="field"><label>既定のナレーター</label><select id="s-narrator"><option>Japanese Female 1</option><option>Japanese Female 2</option><option>Japanese Female 3</option><option>Japanese Male 1</option><option>Japanese Male 2</option><option>Japanese Male 3</option></select></div>
         <div class="field"><label>読み上げ速度（0.5〜2.0）</label><input id="s-speed" type="text" placeholder="1.5"></div>
         <div class="field"><label>解説キャスターを出す</label><select id="s-character"><option value="true">出す</option><option value="false">出さない</option></select></div>
