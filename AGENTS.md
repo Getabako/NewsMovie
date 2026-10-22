@@ -23,7 +23,7 @@
 
 ## 起動の作法（手動フォールバック。通常は上記 ashura-start.sh を実行する）
 
-1. Node.js 20 以上があるか確認する（`node --version`）。無ければ `brew install node`
+1. Node.js 24 以上があるか確認する（`node --version`）。無ければ `brew install node`
 2. `npm install`（YouTube 投稿に使う playwright だけ。投稿しないなら省略しても動く）
 3. リポジトリ直下で `node bin/cli.js` を実行して起動する（ポート 4593 を起点に空きポートを自動選択）。ブラウザが自動で開く
 4. 調査・台本・背景は codex CLI（ChatGPT サブスク）。`codex --version` で確認し、無ければ `brew install codex`、初回は `codex login`。0.150 以上
