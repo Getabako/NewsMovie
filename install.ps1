@@ -1,4 +1,4 @@
-# ニュース動画メーカー 〜世界の今を、日本で暮らす目で〜 — ワンライン導入＆起動（Windows / PowerShell）
+﻿# ニュース動画メーカー 〜世界の今を、日本で暮らす目で〜 — ワンライン導入＆起動（Windows / PowerShell）
 #
 # 導入コマンドはアシュラのサイト（https://service.if-juku.net/Ashura/arts）で配布しています。
 #
